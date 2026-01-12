@@ -1,0 +1,10 @@
+_min_copier_version: "9.0"
+answers_file: null
+
+project_name:
+  type: str
+  default: "Example Project"
+
+python_version:
+  type: str
+  default: "3.12"
