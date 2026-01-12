@@ -1,0 +1,13 @@
+# templates/python/template/{{ project_slug }}/devenv.yaml.jinja
+imports:
+  - imports/python-base.yaml
+{% if use_precommit %}
+  - imports/precommit.yaml
+{% endif %}
+{% if services %}
+  - imports/services.yaml
+{% endif %}
+
+inputs:
+  nixpkgs:
+    url: github:cachix/devenv-nixpkgs/rolling

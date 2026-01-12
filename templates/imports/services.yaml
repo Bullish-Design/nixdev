@@ -1,0 +1,11 @@
+# templates/imports/services.yaml
+# Services configuration template
+
+profiles:
+  services:
+    module:
+      services:
+        postgres:
+          enable: false
+        redis:
+          enable: false

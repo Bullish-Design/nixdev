@@ -1,46 +1,32 @@
-{ pkgs, lib, config, inputs, ... }:
+# devenv.nix
+{ pkgs, config, ... }: {
+  languages.python = {
+    enable = true;
+    version = "3.12";
+    uv.enable = true;
+  };
 
-{
-  # https://devenv.sh/basics/
-  env.GREET = "devenv";
+  packages = with pkgs; [
+    python312Packages.copier
+  ];
 
-  # https://devenv.sh/packages/
-  packages = [ pkgs.git ];
+  scripts = {
+    test.exec = "pytest \"$@\"";
+    format.exec = "ruff format src/ tests/";
+    lint.exec = "ruff check src/ tests/";
+    type-check.exec = "mypy src/";
+  };
 
-  # https://devenv.sh/languages/
-  # languages.rust.enable = true;
+  git-hooks.hooks = {
+    ruff-format.enable = true;
+    #ruff-check.enable = true;
+  };
 
-  # https://devenv.sh/processes/
-  # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
+  profiles.dev.module = {
+    git-hooks.enable = true;
+  };
 
-  # https://devenv.sh/services/
-  # services.postgres.enable = true;
-
-  # https://devenv.sh/scripts/
-  scripts.hello.exec = ''
-    echo hello from $GREET
-  '';
-
-  # https://devenv.sh/basics/
-  enterShell = ''
-    hello         # Run scripts directly
-    git --version # Use packages
-  '';
-
-  # https://devenv.sh/tasks/
-  # tasks = {
-  #   "myproj:setup".exec = "mytool build";
-  #   "devenv:enterShell".after = [ "myproj:setup" ];
-  # };
-
-  # https://devenv.sh/tests/
-  enterTest = ''
-    echo "Running tests"
-    git --version | grep --color=auto "${pkgs.git.version}"
-  '';
-
-  # https://devenv.sh/git-hooks/
-  # git-hooks.hooks.shellcheck.enable = true;
-
-  # See full reference at https://devenv.sh/reference/options/
+  outputs = {
+    nixdev = config.languages.python.import ./. {};
+  };
 }

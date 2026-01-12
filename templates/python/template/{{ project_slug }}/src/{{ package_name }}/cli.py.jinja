@@ -1,0 +1,25 @@
+# templates/python/template/{{ project_slug }}/src/{{ package_name }}/cli.py.jinja
+{% if has_cli %}
+"""CLI for {{ project_name }}."""
+
+from __future__ import annotations
+
+import typer
+
+app = typer.Typer()
+
+
+@app.command()
+def hello(name: str = "World") -> None:
+    """Say hello."""
+    typer.echo(f"Hello, {name}!")
+
+
+def main() -> None:
+    """Entry point."""
+    app()
+
+
+if __name__ == "__main__":
+    main()
+{% endif %}
