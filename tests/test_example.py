@@ -3,6 +3,7 @@ from __future__ import annotations
 import difflib
 import filecmp
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -67,10 +68,19 @@ def main() -> int:
 
     env = os.environ.copy()
     env["NIXDEV_TEMPLATE_PYTHON"] = str(templates_dir / "python")
+    pythonpath_entries = [str(repo_root / "src")]
+    existing_pythonpath = env.get("PYTHONPATH")
+    if existing_pythonpath:
+        pythonpath_entries.append(existing_pythonpath)
+    env["PYTHONPATH"] = os.pathsep.join(pythonpath_entries)
+
+    python = shutil.which("python")
+    if python is None:
+        raise RuntimeError("Unable to find 'python' on PATH")
 
     subprocess.run(
         [
-            sys.executable,
+            python,
             "-m",
             "nixdev.cli",
             "create",
