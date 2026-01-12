@@ -74,7 +74,15 @@ def create_project(
         services=service_list,
     )
 
-    generator = TemplateGenerator.from_package()
+    try:
+        generator = TemplateGenerator.from_env("python")
+    except RuntimeError as e:
+        typer.echo(f"Error: {e}", err=True)
+        typer.echo("Import template in devenv.yaml:", err=True)
+        typer.echo("  inputs:", err=True)
+        typer.echo("    python-template:", err=True)
+        typer.echo("      url: github:USER/python-template", err=True)
+        raise typer.Exit(1)
 
     try:
         result = generator.generate_python_project(config, destination)
