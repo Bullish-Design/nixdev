@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -14,15 +15,18 @@ from nixdev.models import PythonProjectConfig, TemplateResult
 class TemplateGenerator:
     """Generate projects from templates."""
 
-    def __init__(self, templates_dir: Path) -> None:
-        """Initialize generator with templates directory."""
-        self.templates_dir = templates_dir
+    def __init__(self, template_path: Path) -> None:
+        """Initialize generator with template path."""
+        self.template_path = template_path
 
     @classmethod
-    def from_package(cls) -> TemplateGenerator:
-        """Create generator using bundled templates."""
-        templates_dir = Path(__file__).parent.parent.parent / "templates"
-        return cls(templates_dir)
+    def from_env(cls, template_name: str) -> TemplateGenerator:
+        """Create generator using template path from environment."""
+        env_var = f"NIXDEV_TEMPLATE_{template_name.upper()}"
+        template_path = os.environ.get(env_var)
+        if not template_path:
+            raise RuntimeError(f"{env_var} not set. Import template via devenv.yaml")
+        return cls(Path(template_path))
 
     def generate_python_project(
         self,
@@ -46,10 +50,8 @@ class TemplateGenerator:
             FileExistsError: If destination exists and force=False
             RuntimeError: If template generation fails
         """
-        template_path = self.templates_dir / "python"
-
-        if not template_path.exists():
-            raise FileNotFoundError(f"Template not found: {template_path}")
+        if not self.template_path.exists():
+            raise FileNotFoundError(f"Template not found: {self.template_path}")
 
         if destination.exists() and not force:
             raise FileExistsError(f"Destination exists: {destination}")
@@ -58,7 +60,7 @@ class TemplateGenerator:
 
         try:
             run_copy(
-                src_path=str(template_path),
+                src_path=str(self.template_path),
                 dst_path=destination,
                 data=data,
                 unsafe=True,
