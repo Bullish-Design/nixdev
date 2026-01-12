@@ -6,9 +6,9 @@
     uv.enable = true;
   };
 
-  packages = with pkgs; [
-    python312Packages.copier
-  ];
+  #packages = with pkgs; [
+  #  python312Packages.copier
+  #];
 
   scripts = {
     test.exec = "pytest \"$@\"";
